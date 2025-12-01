@@ -1,8 +1,4 @@
-from flask import Blueprint, request, jsonify
-import uuid
-from utils.db import db_query, db_execute
-
-auth_bp = Blueprint("auth", __name__)
+import bcrypt
 
 @auth_bp.post("/login")
 def login():
@@ -11,7 +7,7 @@ def login():
     senha = data.get("senha")
 
     user = db_query("""
-        SELECT id_usuario, id_empresa, senha_hash, tipo
+        SELECT id_usuario, id_empresa, senha_hash, tipo, ativo
         FROM usuarios
         WHERE email = %s AND ativo = TRUE
         LIMIT 1
@@ -22,10 +18,11 @@ def login():
 
     user = user[0]
 
-    # Aqui futuramente vamos usar bcrypt
-    if senha != user["senha_hash"]:
+    # verificar hash bcrypt
+    if not bcrypt.checkpw(senha.encode(), user["senha_hash"].encode()):
         return jsonify({"erro": "Senha incorreta"}), 400
 
+    # gerar token
     token = str(uuid.uuid4())
 
     db_execute("""
