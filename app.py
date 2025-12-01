@@ -11,42 +11,36 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "supersecretkey")
 
 
-# =========================================================
-# HEALTH CHECK
-# =========================================================
 @app.route("/healthz")
 def healthz():
     return "ok", 200
 
 
-# =========================================================
-# LOGIN
-# =========================================================
+# -----------------------------
+# LOGIN VIA FORM HTML (CORRETO)
+# -----------------------------
 @app.route("/", methods=["GET", "POST"])
 def login():
-
     if request.method == "GET":
         return render_template("login.html")
 
-    # --------------------------
-    # Sanitização do input
-    # --------------------------
-    email = request.form.get("email", "").strip().lower()
-    senha = request.form.get("senha", "").strip()
+    # Agora pega do FORM, não JSON!
+    email = request.form.get("email")
+    senha = request.form.get("senha")
 
-    # --------------------------
-    # Busca usuário
-    # --------------------------
+    if not email or not senha:
+        return render_template("login.html", erro="Preencha todos os campos")
+
     user = db_query("""
         SELECT 
             id_usuario,
             id_empresa,
             senha_hash,
-            tipo,       -- superadmin / admin / usuario
+            tipo,
             ativo
         FROM usuarios
         WHERE email = %s
-        LIMIT 1;
+        LIMIT 1
     """, (email,))
 
     if not user:
@@ -57,46 +51,32 @@ def login():
     if not user["ativo"]:
         return render_template("login.html", erro="Usuário inativo")
 
-    # --------------------------
-    # Verifica senha Bcrypt
-    # --------------------------
+    # bcrypt
     if not verificar_hash(senha, user["senha_hash"]):
         return render_template("login.html", erro="Senha incorreta")
 
-    # --------------------------
-    # Cria sessão
-    # --------------------------
+    # sessão
     session.clear()
     session["id_usuario"] = user["id_usuario"]
     session["id_empresa"] = user["id_empresa"]
     session["tipo_usuario"] = user["tipo"]
 
-    # superadmin cai no /admin
     if user["tipo"] == "superadmin":
         return redirect("/admin")
 
-    # admin e usuario normal
     return redirect("/dashboard")
 
 
-# =========================================================
-# LOGOUT
-# =========================================================
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/")
 
 
-# =========================================================
-# REGISTER BLUEPRINTS
-# =========================================================
+# blueprints
 register_blueprints(app)
 
 
-# =========================================================
-# EXEC LOCAL
-# =========================================================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
