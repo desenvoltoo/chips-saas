@@ -2,7 +2,7 @@
 
 import os
 from flask import Flask, render_template, request, redirect, session
-from db import db_query
+from utils.db import db_query
 from utils.security import verificar_hash
 from utils.auth_required import login_required
 from routes import register_blueprints
