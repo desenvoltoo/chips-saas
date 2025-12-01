@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from flask import Blueprint, render_template, session, redirect
-from db import db_query
+from utils.db import db_query, db_execute
+
 
 bp_dashboard = Blueprint("dashboard", __name__)
 
@@ -101,3 +102,4 @@ def dashboard():
         alerta_recarga=alerta,
         qtd_alerta=qtd_alerta,
     )
+
