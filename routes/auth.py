@@ -1,4 +1,9 @@
+import uuid
 import bcrypt
+from flask import Blueprint, request, jsonify
+from utils.db import db_query, db_execute
+
+auth_bp = Blueprint("auth", __name__)
 
 @auth_bp.post("/login")
 def login():
