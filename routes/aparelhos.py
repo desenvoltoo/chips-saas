@@ -1,7 +1,7 @@
 # routes/aparelhos.py
 
 from flask import Blueprint, render_template, request, redirect, jsonify, session
-from db import db_query, db_execute
+from utils.db import db_query, db_execute
 from utils.auth_required import login_required
 
 aparelhos_bp = Blueprint("aparelhos", __name__)
