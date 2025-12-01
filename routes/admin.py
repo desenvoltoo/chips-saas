@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import Blueprint, render_template, request, redirect, session
-from db import db_query, db_execute
+from utils.db import db_query, db_execute
 from utils.auth_required import login_required
 from utils.is_admin import admin_required
 
@@ -114,3 +114,4 @@ def usuarios_add():
     """, (nome, email, senha_hash, id_empresa, admin_flag))
 
     return redirect("/admin/usuarios")
+
