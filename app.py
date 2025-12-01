@@ -4,44 +4,45 @@ import os
 from flask import Flask, render_template, request, redirect, session
 from utils.security import verificar_hash
 from utils.db import db_query
+from utils.is_admin import login_required
 from routes import register_blueprints
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "supersecretkey")
 
 
-# ============================
-# HEALTH CHECK (para Render)
-# ============================
+# =========================================================
+# HEALTH CHECK
+# =========================================================
 @app.route("/healthz")
 def healthz():
     return "ok", 200
 
 
-# ============================
-# LOGIN PRINCIPAL
-# ============================
+# =========================================================
+# LOGIN
+# =========================================================
 @app.route("/", methods=["GET", "POST"])
 def login():
 
-    # se GET → só exibe tela de login
     if request.method == "GET":
         return render_template("login.html")
 
-    # captura do form
-    email = request.form.get("email")
-    senha = request.form.get("senha")
+    # --------------------------
+    # Sanitização do input
+    # --------------------------
+    email = request.form.get("email", "").strip().lower()
+    senha = request.form.get("senha", "").strip()
 
-    if not email or not senha:
-        return render_template("login.html", erro="Preencha email e senha.")
-
-    # busca usuário
+    # --------------------------
+    # Busca usuário
+    # --------------------------
     user = db_query("""
         SELECT 
             id_usuario,
             id_empresa,
             senha_hash,
-            tipo,          -- superadmin / admin / usuario
+            tipo,       -- superadmin / admin / usuario
             ativo
         FROM usuarios
         WHERE email = %s
@@ -56,46 +57,46 @@ def login():
     if not user["ativo"]:
         return render_template("login.html", erro="Usuário inativo")
 
-    # ============================
-    # VERIFICA HASH BCRYPT
-    # ============================
+    # --------------------------
+    # Verifica senha Bcrypt
+    # --------------------------
     if not verificar_hash(senha, user["senha_hash"]):
         return render_template("login.html", erro="Senha incorreta")
 
-    # ============================
-    # CRIA SESSÃO
-    # ============================
+    # --------------------------
+    # Cria sessão
+    # --------------------------
     session.clear()
     session["id_usuario"] = user["id_usuario"]
     session["id_empresa"] = user["id_empresa"]
     session["tipo_usuario"] = user["tipo"]
 
-    # superadmin vai para /admin
+    # superadmin cai no /admin
     if user["tipo"] == "superadmin":
         return redirect("/admin")
 
-    # demais → dashboard
+    # admin e usuario normal
     return redirect("/dashboard")
 
 
-# ============================
+# =========================================================
 # LOGOUT
-# ============================
+# =========================================================
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/")
 
 
-# ============================
-# BLUEPRINTS
-# ============================
+# =========================================================
+# REGISTER BLUEPRINTS
+# =========================================================
 register_blueprints(app)
 
 
-# ============================
-# RUN
-# ============================
+# =========================================================
+# EXEC LOCAL
+# =========================================================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(host="0.0.0.0", port=port, debug=True)
