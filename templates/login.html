@@ -36,29 +36,64 @@
         }
     </style>
 </head>
+
 <body>
 
 <div class="card">
     <h3 class="text-center mb-3">Painel Chips SaaS</h3>
 
-    <form method="POST">
-        {% if erro %}
-            <p class="erro">{{ erro }}</p>
-        {% endif %}
+    <p id="erro" class="erro"></p>
 
+    <form id="formLogin">
         <div class="mb-3">
             <label>Email</label>
-            <input type="email" name="email" class="form-control" required>
+            <input id="email" type="email" class="form-control" required>
         </div>
 
         <div class="mb-3">
             <label>Senha</label>
-            <input type="password" name="senha" class="form-control" required>
+            <input id="senha" type="password" class="form-control" required>
         </div>
 
         <button class="btn btn-primary w-100">Entrar</button>
     </form>
 </div>
+
+
+<script>
+document.getElementById("formLogin").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value.trim();
+    const senha = document.getElementById("senha").value.trim();
+    const erroEl = document.getElementById("erro");
+
+    erroEl.innerText = "";
+
+    try {
+        const resposta = await fetch("/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, senha })
+        });
+
+        const data = await resposta.json();
+
+        if (!resposta.ok) {
+            erroEl.innerText = data.erro || "Erro ao fazer login";
+            return;
+        }
+
+        // login OK
+        localStorage.setItem("token", data.token);
+        window.location.href = "/dashboard";
+
+    } catch (err) {
+        erroEl.innerText = "Falha ao conectar ao servidor";
+        console.error(err);
+    }
+});
+</script>
 
 </body>
 </html>
