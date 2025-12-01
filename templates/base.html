@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Painel Chips{% endblock %}</title>
+
+    <!-- Ícones -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- DataTables -->
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+    <!-- CSS Geral -->
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <!-- jQuery + DataTables -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+</head>
+
+<body>
+
+<!-- ================================
+     SIDEBAR PREMIUM
+================================= -->
+<div class="sidebar" id="sidebar">
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <h2 class="side-title">Painel SaaS</h2>
+
+    <a href="/dashboard">
+        <i class="fas fa-chart-line"></i>
+        <span>Dashboard</span>
+    </a>
+
+    <a href="/chips">
+        <i class="fas fa-sim-card"></i>
+        <span>Chips</span>
+    </a>
+
+    <a href="/aparelhos">
+        <i class="fas fa-mobile-alt"></i>
+        <span>Aparelhos</span>
+    </a>
+
+    <a href="/relacionamentos">
+        <i class="fas fa-random"></i>
+        <span>Movimentações</span>
+    </a>
+</div>
+
+
+<!-- ================================
+     CONTEÚDO PRINCIPAL
+================================= -->
+<div class="content" id="content">
+    {% block content %}
+    {% endblock %}
+</div>
+
+
+<!-- ================================
+     JS PARA ABRIR/FECHAR SIDEBAR
+================================= -->
+<script>
+    const sidebar = document.getElementById("sidebar");
+    const content = document.getElementById("content");
+    const toggle = document.getElementById("sidebarToggle");
+
+    toggle.addEventListener("click", () => {
+        sidebar.classList.toggle("collapsed");
+        content.classList.toggle("collapsed");
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block title %}Relacionamentos / Movimentações{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<header class="chip-header">
+    <div class="container">
+        <div class="chip-header-content">
+            <div class="icon-wrapper">
+                <i class="fas fa-random"></i>
+            </div>
+            <div class="header-text">
+                <h1 class="chip-title">Movimentações</h1>
+                <p class="chip-subtitle">Histórico de entregas, devoluções e ações realizadas</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="container chip-container">
+
+    <!-- CARD FORMULÁRIO -->
+    <section class="chip-card">
+        <div class="chip-card-header">
+            <div class="card-icon">
+                <i class="fas fa-plus"></i>
+            </div>
+            <h2 class="card-title">Registrar Movimento</h2>
+        </div>
+
+        <div class="card-content">
+            <form id="form-evento" class="chip-form">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Chip *</label>
+                        <select name="sk_chip" required>
+                            <option value="">Selecione</option>
+                            {% for c in chips %}
+                                <option value="{{ c.sk_chip }}">
+                                    {{ c.numero }} ({{ c.operadora }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Aparelho</label>
+                        <select name="sk_aparelho">
+                            <option value="">Nenhum</option>
+                            {% for a in aparelhos %}
+                                <option value="{{ a.sk_aparelho }}">
+                                    {{ a.modelo }} ({{ a.marca }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tipo de Movimento *</label>
+                        <select name="tipo" required>
+                            <option value="">Selecione</option>
+                            <option value="ENTREGA">ENTREGA</option>
+                            <option value="DEVOLUCAO">DEVOLUÇÃO</option>
+                            <option value="TROCA">TROCA</option>
+                            <option value="RECARGA">RECARGA</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label>Origem</label>
+                        <input name="origem" placeholder="Ex.: Painel, Automático, Sistema X">
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Observação</label>
+                        <textarea name="observacao"></textarea>
+                    </div>
+                </div>
+
+                <button class="chip-btn">
+                    <i class="fas fa-save"></i> Registrar Movimento
+                </button>
+
+            </form>
+        </div>
+    </section>
+
+    <!-- CARD LISTAGEM -->
+    <section class="chip-card">
+        <div class="chip-card-header">
+            <div class="card-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <h2 class="card-title">Movimentações Registradas</h2>
+        </div>
+
+        <div class="card-content">
+
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Buscar movimentações...">
+            </div>
+
+            <div class="chip-table-wrapper">
+                <table class="chip-table">
+                    <thead>
+                        <tr>
+                            <th>Chip</th>
+                            <th>Aparelho</th>
+                            <th>Tipo</th>
+                            <th>Data</th>
+                            <th>Origem</th>
+                            <th>Observação</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tableBody">
+                        {% for r in relacionamentos %}
+                        <tr>
+                            <td>{{ r.numero_chip or r.sk_chip }}</td>
+                            <td>{{ r.modelo_aparelho or "-" }}</td>
+
+                            <td>
+                                <span class="status-badge status-{{ r.tipo|lower }}">
+                                    {{ r.tipo }}
+                                </span>
+                            </td>
+
+                            <td>{{ r.created_at }}</td>
+                            <td>{{ r.origem or "-" }}</td>
+                            <td>{{ r.observacao or "-" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </section>
+
+</main>
+
+<script>
+// Submete via AJAX
+document.querySelector("#form-evento").onsubmit = async (e) => {
+    e.preventDefault();
+
+    const data = Object.fromEntries(new FormData(e.target));
+
+    await fetch("/relacionamentos/add", {
+        method: "POST",
+        body: new URLSearchParams(data)
+    });
+
+    location.reload();
+};
+
+// Filtro dinâmico da tabela
+document.getElementById("searchInput").addEventListener("input", function (e) {
+    const txt = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll("#tableBody tr");
+
+    rows.forEach(row => {
+        row.style.display =
+            row.innerText.toLowerCase().includes(txt) ? "" : "none";
+    });
+});
+</script>
+
+{% endblock %}

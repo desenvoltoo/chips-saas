@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Usuários</h1>
+
+<a class="btn" href="/admin/usuarios/add">+ Novo Usuário</a>
+
+<table class="tabela">
+<thead>
+<tr>
+    <th>ID</th>
+    <th>Nome</th>
+    <th>Email</th>
+    <th>Empresa</th>
+    <th>Admin?</th>
+    <th>Ativo</th>
+</tr>
+</thead>
+<tbody>
+{% for u in usuarios %}
+<tr>
+    <td>{{ u.id_usuario }}</td>
+    <td>{{ u.nome }}</td>
+    <td>{{ u.email }}</td>
+    <td>{{ u.empresa_nome }}</td>
+    <td>{{ "Sim" if u.is_admin else "Não" }}</td>
+    <td>{{ "Sim" if u.ativo else "Não" }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}Gestão de Aparelhos{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<header class="chip-header">
+    <div class="container">
+        <div class="chip-header-content">
+            <div class="icon-wrapper">
+                <i class="fas fa-mobile-alt"></i>
+            </div>
+            <div class="header-text">
+                <h1 class="chip-title">Gestão de Aparelhos</h1>
+                <p class="chip-subtitle">Cadastro, edição e controle de dispositivos</p>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="container chip-container">
+
+    <!-- FORMULÁRIO -->
+    <section class="chip-card">
+        <div class="chip-card-header">
+            <div class="card-icon">
+                <i class="fas fa-plus"></i>
+            </div>
+            <h2 class="card-title" id="titulo-form">Novo Aparelho</h2>
+        </div>
+
+        <div class="card-content">
+            <form id="formAparelho" method="POST" action="/aparelhos/add" class="chip-form">
+
+                <!-- Campo oculto para edição -->
+                <input type="hidden" name="sk_aparelho" id="sk_aparelho">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>ID do Aparelho *</label>
+                        <input type="text" name="id_aparelho" id="id_aparelho" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Modelo *</label>
+                        <input type="text" name="modelo" id="modelo" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Marca *</label>
+                        <input type="text" name="marca" id="marca" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>IMEI</label>
+                        <input type="text" name="imei" id="imei">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select name="status" id="status">
+                            <option value="ATIVO">ATIVO</option>
+                            <option value="EM_USO">EM USO</option>
+                            <option value="MANUTENÇÃO">MANUTENÇÃO</option>
+                            <option value="PARADO">PARADO</option>
+                            <option value="DESCARTADO">DESCARTADO</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="chip-btn" id="botao-salvar">
+                    <i class="fas fa-plus"></i>
+                    Cadastrar Aparelho
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- LISTAGEM -->
+    <section class="chip-card">
+        <div class="chip-card-header">
+            <div class="card-icon">
+                <i class="fas fa-list"></i>
+            </div>
+            <h2 class="card-title">Aparelhos Cadastrados</h2>
+        </div>
+
+        <div class="card-content">
+
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Buscar aparelhos...">
+            </div>
+
+            <div class="chip-table-wrapper">
+                <table class="chip-table">
+                    <thead>
+                        <tr>
+                            <th>SK</th>
+                            <th>ID</th>
+                            <th>Modelo</th>
+                            <th>Marca</th>
+                            <th>IMEI</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tableBody">
+                        {% for a in aparelhos %}
+                        <tr>
+                            <td>{{ a.sk_aparelho }}</td>
+                            <td>{{ a.id_aparelho }}</td>
+                            <td>{{ a.modelo }}</td>
+                            <td>{{ a.marca }}</td>
+                            <td>{{ a.imei or "-" }}</td>
+                            <td>
+                                {% set st = a.status or 'DESCONHECIDO' %}
+                                <span class="status-badge status-{{ st|lower|replace(' ', '-') }}">
+                                    {{ st }}
+                                </span>
+                            </td>
+                            <td>
+                                <button
+                                    class="btn-edit"
+                                    onclick='editarAparelho({{ a|tojson }})'>
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+function editarAparelho(aparelho) {
+    document.getElementById("sk_aparelho").value = aparelho.sk_aparelho;
+    document.getElementById("id_aparelho").value = aparelho.id_aparelho;
+    document.getElementById("modelo").value = aparelho.modelo;
+    document.getElementById("marca").value = aparelho.marca;
+    document.getElementById("imei").value = aparelho.imei || "";
+    document.getElementById("status").value = aparelho.status || "ATIVO";
+
+    // alterar título e botão
+    document.getElementById("titulo-form").innerHTML = '<i class="fas fa-pen"></i> Editar Aparelho';
+    document.getElementById("botao-salvar").innerHTML = '<i class="fas fa-save"></i> Salvar Alterações';
+
+    // Trocar o endpoint para update-json
+    document.getElementById("formAparelho").action = "/aparelhos/update-json";
+
+    window.scrollTo({ top: 80, behavior: "smooth" });
+}
+
+document.getElementById("searchInput").addEventListener("input", function (e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll("#tableBody tr");
+
+    rows.forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(searchTerm) ? "" : "none";
+    });
+});
+</script>
+
+{% endblock %}
