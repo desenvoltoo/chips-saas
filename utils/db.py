@@ -20,6 +20,7 @@ def db_execute(sql, params=None):
     conn = get_conn()
     cur = conn.cursor()
     cur.execute(sql, params)
-    conn.commit()
+    conn.commit() 
     cur.close()
     conn.close()
+
