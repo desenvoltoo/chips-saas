@@ -17,12 +17,13 @@ def gerar_hash(senha: str) -> str:
 def verificar_hash(senha: str, senha_hash: str) -> bool:
     """
     Compara a senha digitada com o hash armazenado (bcrypt).
-    Retorna True se bater, False se não bater ou der erro.
+    Retorna True se estiver correta, False caso contrário.
     """
-    try:
-        if not senha or not senha_hash:
-            return False
 
+    if not senha or not senha_hash:
+        return False
+
+    try:
         return bcrypt.checkpw(
             senha.encode("utf-8"),
             senha_hash.encode("utf-8"),
