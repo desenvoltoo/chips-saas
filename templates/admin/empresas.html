@@ -1,16 +1,67 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h1>Empresas</h1>
+<style>
+    .admin-title {
+        font-size: 28px;
+        margin-bottom: 25px;
+        color: #d4c6f9;
+    }
 
-<a class="btn" href="/admin/empresas/add">+ Nova Empresa</a>
+    .btn-add {
+        background: #6f42c1;
+        padding: 10px 18px;
+        border-radius: 8px;
+        color: #fff;
+        text-decoration: none;
+        margin-bottom: 20px;
+        display: inline-block;
+        transition: 0.2s;
+    }
+    .btn-add:hover {
+        background: #5835a0;
+        transform: translateY(-2px);
+    }
 
-<table class="tabela">
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        color: #fff;
+        background: #151515;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    th {
+        background: #222;
+        padding: 12px;
+        text-align: left;
+        color: #c9b8ff;
+        font-weight: 600;
+    }
+
+    td {
+        padding: 12px;
+        border-bottom: 1px solid #2a2a2a;
+    }
+
+    tr:hover td {
+        background: #1e1e1e;
+    }
+</style>
+
+<h1 class="admin-title">Empresas</h1>
+
+<a class="btn-add" href="/admin/empresas/add">+ Nova Empresa</a>
+
+<table>
 <thead>
 <tr>
     <th>ID</th>
     <th>Nome</th>
-    <th>Ativa</th>
+    <th>Situação</th>
+    <th>Plano</th>
 </tr>
 </thead>
 <tbody>
@@ -18,7 +69,8 @@
 <tr>
     <td>{{ e.id_empresa }}</td>
     <td>{{ e.nome }}</td>
-    <td>{{ "Sim" if e.ativo else "Não" }}</td>
+    <td>{{ "Ativa" if e.ativo else "Inativa" }}</td>
+    <td>{{ e.plano }}</td>
 </tr>
 {% endfor %}
 </tbody>
