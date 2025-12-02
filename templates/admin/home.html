@@ -1,12 +1,83 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h1>Painel Administrativo</h1>
+<style>
+    /* Container principal */
+    .admin-container {
+        padding: 40px;
+        color: #fff;
+    }
 
-<h3>Empresas</h3>
-<a class="btn" href="/admin/empresas">Gerenciar Empresas</a>
+    .admin-title {
+        font-size: 32px;
+        font-weight: 600;
+        margin-bottom: 25px;
+        color: #d4c6f9;
+    }
 
-<h3>Usuários</h3>
-<a class="btn" href="/admin/usuarios">Gerenciar Usuários</a>
+    .admin-section-title {
+        font-size: 22px;
+        font-weight: 500;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        color: #b8b8ff;
+    }
+
+    /* Cards */
+    .admin-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .admin-card {
+        background: #151515;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 0 18px #0005;
+        transition: 0.2s;
+        text-decoration: none;
+        color: #fff;
+        border: 1px solid #2a2a2a;
+    }
+
+    .admin-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 0 25px #0008;
+        border-color: #6f42c1;
+    }
+
+    .admin-card h4 {
+        margin: 0;
+        font-size: 20px;
+        margin-bottom: 8px;
+        color: #c9b8ff;
+    }
+
+    .admin-card p {
+        margin: 0;
+        font-size: 14px;
+        color: #ccc;
+    }
+</style>
+
+<div class="admin-container">
+
+    <h1 class="admin-title">Painel Administrativo</h1>
+
+    <div class="admin-cards">
+        <a class="admin-card" href="/admin/empresas">
+            <h4>Empresas</h4>
+            <p>Gerenciar empresas, criar novas e editar existentes.</p>
+        </a>
+
+        <a class="admin-card" href="/admin/usuarios">
+            <h4>Usuários</h4>
+            <p>Adicionar, editar e gerenciar contas de acesso.</p>
+        </a>
+    </div>
+
+</div>
 
 {% endblock %}
